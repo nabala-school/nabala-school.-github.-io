@@ -267,6 +267,28 @@
 
 <script>
 /* ================= إعدادات الحقول ================= */
+const GRADES = ['الأول متوسط','الثاني متوسط','الثالث متوسط','الرابع إعدادي','الخامس إعدادي','السادس إعدادي'];
+const CLASS_SECTIONS = ['أ','ب','ج','د','هـ','و','ز','ح'];
+const ID_TYPES = ['البطاقة الوطنية','هوية الأحوال الشخصية'];
+
+/* حقول الهوية (تظهر حسب نوع الهوية المختار)
+   p = 'student' أو 'father' ، who = وصف صاحب الهوية للتسمية */
+function idFields(p, who){
+  const t = p+'IdType';
+  const nid = {key:t, value:ID_TYPES[0]};
+  const civ = {key:t, value:ID_TYPES[1]};
+  return [
+    {key:t, label:'نوع هوية '+who, type:'select', options:ID_TYPES},
+    {key:p+'NidCountry', label:'بلد الإصدار (البطاقة الوطنية - '+who+')', formLabel:'بلد الإصدار', type:'text', showIf:nid},
+    {key:p+'NidNumber',  label:'رقم البطاقة الوطنية ('+who+')', formLabel:'رقم البطاقة الوطنية', type:'text', showIf:nid},
+    {key:p+'CivCountry', label:'بلد الإصدار (هوية الأحوال الشخصية - '+who+')', formLabel:'بلد الإصدار', type:'text', showIf:civ},
+    {key:p+'CivOfficeNo',label:'رقم جهة الأحوال المدنية ('+who+')', formLabel:'رقم جهة الأحوال المدنية', type:'text', showIf:civ},
+    {key:p+'CivRecordNo',label:'رقم السجل ('+who+')', formLabel:'رقم السجل', type:'text', showIf:civ},
+    {key:p+'CivSheetNo', label:'رقم الصحيفة ('+who+')', formLabel:'رقم الصحيفة', type:'text', showIf:civ},
+    {key:p+'CivIssuer',  label:'جهة الإصدار ('+who+')', formLabel:'جهة الإصدار', type:'text', showIf:civ},
+  ];
+}
+
 const SECTIONS = [
   { id:'s1', title:'بيانات الطالب الشخصية', fields:[
     {key:'name', label:'الاسم', type:'text', required:true},
@@ -274,35 +296,33 @@ const SECTIONS = [
     {key:'paternalGrandfather', label:'اسم والد الأب', type:'text'},
     {key:'paternalGreatGrandfather', label:'اسم جد الأب', type:'text'},
     {key:'lastName', label:'اللقب', type:'text', required:true},
-    {key:'birthDate', label:'تاريخ التولد', type:'date', required:true},
-    {key:'birthPlace', label:'محل الولادة', type:'text'},
-    {key:'hometown', label:'مسقط الرأس', type:'text'},
-    {key:'gender', label:'الجنس', type:'select', options:['ذكر','أنثى'], required:true},
-    {key:'nationality', label:'الجنسية', type:'text', required:true},
-  ]},
-  { id:'s2', title:'بيانات الأبوين', fields:[
-    {key:'orphanStatus', label:'حالة فقدان الأبوين', type:'select', options:['غير فاقد','فاقد الأب','فاقد الأم','فاقد الأبوين']},
     {key:'motherName', label:'اسم الأم', type:'text', required:true},
     {key:'motherFather', label:'اسم والد الأم', type:'text'},
     {key:'motherGrandfather', label:'اسم جد الأم', type:'text'},
+    {key:'birthDate', label:'تاريخ التولد', type:'date', required:true},
+    {key:'birthPlace', label:'محل الولادة', type:'text'},
   ]},
-  { id:'s3', title:'بيانات الهوية والإحصاء', fields:[
-    {key:'studentIdType', label:'نوع هوية الطالب', type:'select', options:['بطاقة وطنية','جواز سفر','شهادة الجنسية','هوية الأحوال المدنية','أخرى']},
-    {key:'studentIdCountry', label:'بلد إصدار هوية الطالب', type:'text'},
-    {key:'fatherIdType', label:'نوع هوية الأب', type:'select', options:['بطاقة وطنية','جواز سفر','شهادة الجنسية','هوية الأحوال المدنية','أخرى']},
-    {key:'fatherIdCountry', label:'بلد إصدار هوية الأب', type:'text'},
+  { id:'s2', title:'بيانات الهوية والرقم الإحصائي', fields:[
+    ...idFields('student','الطالب'),
+    ...idFields('father','الأب'),
     {key:'statisticalNumber', label:'الرقم الإحصائي', type:'text', required:true},
   ]},
-  { id:'s4', title:'معلومات إضافية', fields:[
+  { id:'s3', title:'معلومات إضافية', fields:[
+    {key:'gender', label:'الجنس', type:'select', options:['ذكر','أنثى'], required:true},
+    {key:'nationality', label:'الجنسية', type:'text', required:true},
+    {key:'hometown', label:'مسقط الرأس', type:'text'},
     {key:'motherTongue', label:'اللغة الأم', type:'text'},
     {key:'bloodType', label:'فئة الدم', type:'select', options:['A+','A-','B+','B-','AB+','AB-','O+','O-','غير معروف']},
     {key:'religion', label:'الديانة', type:'text'},
-    {key:'specialNeeds', label:'الاحتياجات الخاصة', type:'text', placeholder:'اكتب "لا يوجد" إن لم توجد'},
+    {key:'phone', label:'رقم الهاتف', type:'tel', required:true},
+    {key:'specialNeeds', label:'الاحتياجات الخاصة (إن وجدت)', type:'text', placeholder:'اكتب "لا يوجد" إن لم توجد'},
     {key:'studyLanguage', label:'لغة الدراسة', type:'select', options:['العربية','الإنكليزية','الكردية','أخرى']},
-    {key:'livingStandard', label:'المستوى المعيشي', type:'select', options:['ميسور','متوسط','محدود']},
-    {key:'careGrant', label:'مشمول بمنحة الرعاية', type:'select', options:['نعم','لا']},
+    {key:'livingStandard', label:'المستوى المعيشي', type:'select', options:['الطبقة تحت خط الفقر','الطبقة الفقيرة','الطبقة الوسطى','الطبقة العليا']},
+    {key:'careGrant', label:'مشمول بمنحة الرعاية الاجتماعية', type:'select', options:['نعم','لا']},
+    {key:'grade', label:'الصف الدراسي', type:'select', options:GRADES, required:true},
+    {key:'section', label:'الشعبة', type:'select', options:CLASS_SECTIONS, required:true},
   ]},
-  { id:'s6', title:'العنوان ووسائل التواصل', fields:[
+  { id:'s4', title:'العنوان ووسائل التواصل', fields:[
     {key:'place', label:'المكان', type:'text'},
     {key:'city', label:'المدينة', type:'text', required:true},
     {key:'district', label:'الحي', type:'text'},
@@ -311,10 +331,17 @@ const SECTIONS = [
     {key:'address1', label:'عنوان 1', type:'text'},
     {key:'address2', label:'عنوان 2', type:'text'},
     {key:'landmark', label:'أقرب نقطة دالة', type:'text'},
-    {key:'phone', label:'رقم الهاتف', type:'tel', required:true},
     {key:'email', label:'البريد الإلكتروني', type:'email'},
   ]},
 ];
+
+/* الحقول الظاهرة فعلاً حسب الشروط (showIf) */
+function visibleFields(fields, data){
+  return fields.filter(f=>!f.showIf || (data||{})[f.showIf.key]===f.showIf.value);
+}
+/* الحقول التي تتحكم بظهور حقول أخرى */
+const CONTROLLER_KEYS = new Set();
+SECTIONS.forEach(s=>s.fields.forEach(f=>{ if(f.showIf) CONTROLLER_KEYS.add(f.showIf.key); }));
 /* ================= مزامنة مباشرة مع Google Sheets =================
    ضع هنا رابط الويب أب (Web App URL) بعد نشر سكربت Google Apps Script
    (الخطوات موجودة برسالة Claude). خله فاضي '' إذا ما تريد هذي الميزة.
@@ -341,15 +368,8 @@ function syncToGoogleSheet(payload, reqNum){
   }catch(e){ /* لا نوقف الإرسال إذا فشلت المزامنة */ }
 }
 
-const ALL_FIELDS = [
-  {key:'grade', label:'الصف الدراسي', type:'text', required:true},
-  {key:'section', label:'الشعبة', type:'text', required:true},
-  ...SECTIONS.flatMap(s=>s.fields)
-];
-const GRADES = ['الأول متوسط','الثاني متوسط','الثالث متوسط','الرابع إعدادي','الخامس إعدادي','السادس إعدادي'];
-const CLASS_SECTIONS = ['أ','ب','ج','د','هـ','و','ز','ح'];
+const ALL_FIELDS = SECTIONS.flatMap(s=>s.fields);
 const LS_KEY = 'nb_school_requests_v1';
-const ADMIN_EMAIL = 'drfyjgujj6799@gmail.com'; // إيميل المدير (غيّره إذا مختلف)
 const ADMIN_EMAIL_KEY = 'nb_admin_email_for_signin';
 
 /* ================= إعدادات Firebase =================
@@ -466,7 +486,7 @@ async function generateRequestNumber(){
 }
 function validateFields(fields, data){
   const missing = [];
-  fields.forEach(f=>{
+  visibleFields(fields, data).forEach(f=>{
     if(f.required && !String(data[f.key]||'').trim()) missing.push(f.label);
   });
   return missing;
@@ -575,7 +595,7 @@ function renderStudentForm(){
     if(i===state.studentStep) cls+=' active';
     return `<div class="${cls}"></div>`;
   }).join('');
-  const fieldsHtml = section.fields.map(f=>renderField(f, state.formData[f.key])).join('');
+  const fieldsHtml = visibleFields(section.fields, state.formData).map(f=>renderField(f, state.formData[f.key])).join('');
   const isLast = state.studentStep === total-1;
   return `
   ${topbar(false)}
@@ -610,7 +630,7 @@ function renderField(f, value){
     const ph = f.placeholder ? `placeholder="${escapeHtml(f.placeholder)}"` : '';
     input = `<input type="${f.type}" data-field="${f.key}" ${req} value="${escapeHtml(val)}" ${ph}>`;
   }
-  return `<label class="field"><span>${escapeHtml(f.label)}${f.required?' <em>*</em>':''}</span>${input}</label>`;
+  return `<label class="field"><span>${escapeHtml(f.formLabel||f.label)}${f.required?' <em>*</em>':''}</span>${input}</label>`;
 }
 
 function renderStudentSuccess(){
@@ -711,7 +731,7 @@ function renderAdminForm(){
   const sectionsHtml = SECTIONS.map(sec=>`
     <div class="section-block">
       <h3>${escapeHtml(sec.title)}</h3>
-      <div class="fields-grid">${sec.fields.map(f=>renderField(f, state.formData[f.key])).join('')}</div>
+      <div class="fields-grid">${visibleFields(sec.fields, state.formData).map(f=>renderField(f, state.formData[f.key])).join('')}</div>
     </div>`).join('');
   return `
   ${topbar(true)}
@@ -727,7 +747,7 @@ function renderAdminForm(){
 }
 
 function renderDetailModal(r){
-  const items = ALL_FIELDS.map(f=>`
+  const items = visibleFields(ALL_FIELDS, r).map(f=>`
     <div class="detail-item"><span class="k">${escapeHtml(f.label)}</span><span class="v">${escapeHtml(r[f.key]||'-')}</span></div>
   `).join('');
   return `
@@ -753,7 +773,12 @@ document.getElementById('app').addEventListener('change', onAppInput);
 
 function onAppInput(e){
   const key = e.target.dataset.field;
-  if(key){ state.formData[key] = e.target.value; }
+  if(key){
+    state.formData[key] = e.target.value;
+    if(e.type==='change' && CONTROLLER_KEYS.has(key)){
+      const y = window.scrollY; render(); window.scrollTo(0, y);
+    }
+  }
 }
 
 async function onAppClick(e){
@@ -825,8 +850,8 @@ async function onAppClick(e){
     state.adminError=''; state.adminInfo='';
     if(!auth){
       state.adminError='نظام تسجيل الدخول غير متاح';
-    } else if(u !== ADMIN_EMAIL.toLowerCase()){
-      state.adminError='هذا البريد غير مصرّح له بالدخول';
+    } else if(!u || u.indexOf('@')<1){
+      state.adminError='اكتب بريداً إلكترونياً صحيحاً';
     } else {
       setBusy(true);
       try{
@@ -963,7 +988,6 @@ async function exportToExcel(list){
     try{ email = localStorage.getItem(ADMIN_EMAIL_KEY) || ''; }catch(e){}
     if(!email) email = (window.prompt('اكتب بريدك الإلكتروني لتأكيد الدخول:') || '').trim().toLowerCase();
     try{
-      if(email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) throw new Error('بريد غير مصرّح');
       await auth.signInWithEmailLink(email, location.href);
       try{ localStorage.removeItem(ADMIN_EMAIL_KEY); }catch(e){}
       history.replaceState(null, '', location.origin + location.pathname);
